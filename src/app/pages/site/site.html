@@ -1,0 +1,287 @@
+<div class="container mt-4">
+  <div class="row">
+
+
+    @if(isFormView()){
+    <!-- Form Section -->
+    <div class="col-lg-5 mb-4">
+      <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-info text-white">
+
+          <div class="row">
+
+            <div class="col-6">
+              <h4 class="mb-0">Create Site</h4>
+            </div>
+
+
+            <div class="col-6 text-end">
+
+              <button class="btn btn-sm btm-success" (click)="toggleView()">Go To Site List</button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card-body">
+          <form>
+            <div class="row">
+              <!-- Site Title -->
+              <div class="col-12 mb-3">
+                <label class="form-label">Site Title</label>
+                <input type="text" class="form-control" [(ngModel)]="formObj.siteTitle" name="siteTitle"
+                  #title="ngModel" required minlength="5" />
+                @if (title.touched) {
+                <div class="text-danger mt-1">
+                  @if (title.errors?.['required']) {
+                  <div><i class="bi bi-exclamation-circle"></i> This field is required</div>
+                  }
+                  @if (title.errors?.['minlength']) {
+                  <div><i class="bi bi-exclamation-circle"></i> Minimum 5 characters required</div>
+                  }
+                </div>
+                }
+              </div>
+
+
+              <!-- Location -->
+              <div class="col-12 mb-3">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" [(ngModel)]="formObj.location" name="location" />
+              </div>
+
+              <!-- Property Type -->
+              <div class="col-12 mb-3">
+                <label class="form-label">Property Type</label>
+                <select class="form-select">
+                  <option value="">Select Property Type</option>
+                  @for(item of propertyTypes$ | async; track $index){
+                  <option [value]="item.propertyTypeId">{{item.propertyType}}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- City, Pincode -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" [(ngModel)]="formObj.city" name="city" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Pincode</label>
+                <input type="text" class="form-control" [(ngModel)]="formObj.pincode" name="pincode" />
+              </div>
+
+              <!-- State, Total Properties -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" [(ngModel)]="formObj.state" name="state" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Total Properties</label>
+                <input type="text" class="form-control" [(ngModel)]="formObj.totalProperties" name="totalProperties" />
+              </div>
+
+              <!-- Dates -->
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" *ngIf="!isEditMode" class="btn btn-success" (click)="onSave()">
+                <i class="bi bi-save">Save</i> </button>
+              <button type="button" *ngIf="isEditMode" class="btn btn-success" (click)="onUpdate()">
+                <i class="bi bi-save">Update</i>
+              </button>
+
+              <!-- <button type="button" class="btn btn-warning">
+                <i class="bi bi-pencil-square"></i> Update
+              </button>
+
+              <button type="button" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancel
+              </button> -->
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    }
+    @else{
+
+
+    <!-- Site List Section -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-primary text-white">
+          <div class="row">
+
+            <div class="col-6">
+              <h4 class="mb-0">SiteList</h4>
+            </div>
+
+
+            <div class="col-6 text-end">
+
+              <button class="btn btn-sm btm-success" (click)="toggleView()">Go To Create Site</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Location</th>
+
+                <th>City</th>
+
+                <th>State</th>
+                <th>Total Property</th>
+
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="gridData.length==0">
+                <tr>
+                  <td colspan="5" class="text-center text-muted">No sites available</td>
+                </tr>
+
+              </ng-container>
+              <tr *ngFor="let data of gridData;let sr=index">
+                <td>{{sr+1}}</td>
+                <td>{{data.siteTitle}}</td>
+                <td>{{data.location}}</td>
+
+                <td>{{data.city}}</td>
+                <td>{{data.state}}</td>
+                <td>{{data.totalProperties}}</td>
+
+                <td>
+                  <button class="btn btn-sm btn-warning me-2" (click)="onEdit(data)">
+                    <i class="bi bi-pencil-square">Edit</i>
+                  </button>
+
+                  <button class="btn btn-sm btn-success me-2" (click)="openModel(data)">
+                    <i class="bi bi-pencil-square">Properties</i>
+                  </button>
+
+                  <button class="btn btn-sm btn-danger" (click)="onDelete(data)">
+                    <i class="bi bi-trash">Delete</i>
+                  </button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal" #propertymodel>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          (click)="closeModel()"></button>
+      </div>
+      <div class="modal-body">
+
+        <form [formGroup]="propertyForm">
+          <div class="row g-3">
+
+            <!-- Property No -->
+            <div class="col-md-6">
+              <label class="form-label">Property No</label>
+              <input type="text" class="form-control" formControlName="propertyNo" />
+            </div>
+
+            <!-- Facing -->
+            <div class="col-md-6">
+              <label class="form-label">Facing</label>
+              <input type="text" class="form-control" formControlName="facing" />
+            </div>
+
+            <!-- Total Area -->
+            <div class="col-md-6">
+              <label class="form-label">Total Area</label>
+              <input type="text" class="form-control" formControlName="totalArea" />
+            </div>
+
+            <!-- Rate -->
+            <div class="col-md-6">
+              <label class="form-label">Rate</label>
+              <input type="text" class="form-control" formControlName="rate" />
+            </div>
+
+
+
+
+
+          </div>
+
+          <!-- Submit -->
+          <div class="mt-4 text-end">
+            <button type="button" class="btn btn-primary" [disabled]="propertyForm.invalid"
+              (click)="onSaveProperty()">Save</button>
+          </div>
+        </form>
+        <div class="mt-5">
+          <h4>Submitted Properties</h4>
+          <table class="table table-bordered table-hover mt-3">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Property No</th>
+                <th>Facing</th>
+                <th>Total Area</th>
+                <th>Rate</th>
+                 <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+           
+                <tr *ngFor="let item of propertyList; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ item.propertyNo }}</td>
+                  <td>{{ item.facing }}</td>
+                  <td>{{ item.totalArea }}</td>
+                  <td>{{ item.rate }}</td>
+                  <td>  
+                      <button class="btn btn-sm btn-danger" >
+                    <i class="bi bi-trash">Delete</i>
+                  </button>
+                    
+                    <button class="btn btn-sm btn-warn" >
+                    <i class="bi bi-trash">Delete</i>
+                  </button>
+                
+                </td>
+                </tr>
+            
+
+
+            </tbody>
+          </table>
+
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModel()">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
